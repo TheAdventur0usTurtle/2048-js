@@ -22,7 +22,9 @@ class Game { // by ruzhila.cn
     }
     addNumberAndDraw() {
         let available = this.board.flatMap((row, i) => row.map((v, j) => v === 0 ? [i, j] : null).filter(v => v !== null))
-        if (available.length === 0) return;
+        if (available.length === 0) {
+            return;
+        }
         let [newI, newJ] = available[Math.floor(Math.random() * available.length)]
         this.board[newI][newJ] = 2
         for (var i = 0; i < this.board.length; i++) {
