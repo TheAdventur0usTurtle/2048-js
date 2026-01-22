@@ -2,6 +2,14 @@ const colorpalette = {
     0: '#6e5f74', 2: '#00d0a4', 4: '#dd7373', 8: '#7d53de', 16: '#6622cc', 32: '#00bfb2',
     64: '#c06ff2', 128: '#340068', 256: '#3e92cc', 512: '#d8315b', 1024: '#1c0b19', 2048: '#1c0b19'
 }
+function flipMatrix(matrix){
+    matrix = matrix[0].map((_, colIndex) =>     //code slightly adjusted from https://www.geeksforgeeks.org/javascript/transpose-a-two-dimensional-2d-array-in-javascript/
+    matrix.map(row => row[colIndex]))
+}
+function filterDuplicates(row){
+   const uniqueSet = new Set(row)   // Code created with the help of Google AI Overviews
+   row = [...uniqueSet]
+}
 class Game { // by ruzhila.cn
     constructor(ctx) {
         this.ctx = ctx;
@@ -22,8 +30,22 @@ class Game { // by ruzhila.cn
     }
     addNumberAndDraw() {
         let available = this.board.flatMap((row, i) => row.map((v, j) => v === 0 ? [i, j] : null).filter(v => v !== null))
+        let tempBoard = structuredClone(this.board);
         if (available.length === 0) {
-            return;
+            for(let currentRow = 0; currentRow < 4; currentRow++) {
+                uniqueInRow = filterDuplicates(tempBoard[currentRow])
+                if(uniqueInRow < 4){
+                    break
+                }
+                if(currentRow == 3) {
+                    if(isColumn){
+                        return
+                    } else {
+                        flipMatrix(tempBoard)
+                        currentRow = 0
+                    }
+                }
+            }
         }
         let [newI, newJ] = available[Math.floor(Math.random() * available.length)]
         this.board[newI][newJ] = 2
@@ -46,6 +68,8 @@ class Game { // by ruzhila.cn
                     this.board[i][j] = this.board[k][j]
                     this.board[k][j] = 0
                 } else if (this.board[i][j] === this.board[k][j]) {
+                    if (Math.abs(i-k) == 2 && this.board[(i+k)/2][j] != 0) return;
+                    if (Math.abs(i-k) == 3 && (this.board[1][j] != 0 || this.board[2][j] != 0)) return;
                     this.board[i][j] *= 2
                     this.board[k][j] = 0
                 }
@@ -57,6 +81,8 @@ class Game { // by ruzhila.cn
                     this.board[i][j] = this.board[i][k]
                     this.board[i][k] = 0
                 } else if (this.board[i][j] === this.board[i][k]) {
+                    if (Math.abs(j-k) == 2 && this.board[i][(j+k)/2] != 0) return;
+                    if (Math.abs(j-k) == 3 && (this.board[i][1] != 0 || this.board[i][2] != 0)) return;
                     this.board[i][j] *= 2
                     this.board[i][k] = 0
                 }
