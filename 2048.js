@@ -51,7 +51,7 @@ class Game { // by ruzhila.cn
                         return
                     } else {
                         tempBoard = transpose(tempBoard)
-                        currentRow = 0
+                        currentRow = -1
                         isColumn = true
                     }
                 }
