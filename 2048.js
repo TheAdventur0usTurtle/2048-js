@@ -2,14 +2,22 @@ const colorpalette = {
     0: '#6e5f74', 2: '#00d0a4', 4: '#dd7373', 8: '#7d53de', 16: '#6622cc', 32: '#00bfb2',
     64: '#c06ff2', 128: '#340068', 256: '#3e92cc', 512: '#d8315b', 1024: '#1c0b19', 2048: '#1c0b19'
 }
-function flipMatrix(matrix){
-    matrix = matrix[0].map((_, colIndex) =>     //code slightly adjusted from https://www.geeksforgeeks.org/javascript/transpose-a-two-dimensional-2d-array-in-javascript/
-    matrix.map(row => row[colIndex]))
+
+const transpose = matrix => {                        // Code created with the help of Google AI Overviews
+    return matrix[0].map((_, colIndex) => 
+        matrix.map(row => row[colIndex]) 
+    )
 }
-function filterDuplicates(row){
-   const uniqueSet = new Set(row)   // Code created with the help of Google AI Overviews
-   row = [...uniqueSet]
+
+function hasConsecutiveDuplicates(arr) {             // Code created with the help of Google AI Overviews
+  for (let i = 0; i < arr.length - 1; i++) {
+    if (arr[i] === arr[i + 1]) {
+      return true; // Found consecutive duplicates
+    }
+  }
+  return false; // No consecutive duplicates found
 }
+
 class Game { // by ruzhila.cn
     constructor(ctx) {
         this.ctx = ctx;
@@ -31,35 +39,39 @@ class Game { // by ruzhila.cn
     addNumberAndDraw() {
         let available = this.board.flatMap((row, i) => row.map((v, j) => v === 0 ? [i, j] : null).filter(v => v !== null))
         let tempBoard = structuredClone(this.board);
+        let isColumn = false
         if (available.length === 0) {
             for(let currentRow = 0; currentRow < 4; currentRow++) {
-                uniqueInRow = filterDuplicates(tempBoard[currentRow])
-                if(uniqueInRow < 4){
+                let uniqueConsecutiveInRow = hasConsecutiveDuplicates(tempBoard[currentRow])
+                if(uniqueConsecutiveInRow){
                     break
                 }
                 if(currentRow == 3) {
                     if(isColumn){
                         return
                     } else {
-                        flipMatrix(tempBoard)
+                        tempBoard = transpose(tempBoard)
                         currentRow = 0
+                        isColumn = true
                     }
                 }
             }
-        }
-        let [newI, newJ] = available[Math.floor(Math.random() * available.length)]
-        this.board[newI][newJ] = 2
-        for (var i = 0; i < this.board.length; i++) {
-            for (var j = 0; j < this.board[i].length; j++) {
-                this.ctx.fillStyle = colorpalette[this.board[i][j]];
-                this.ctx.fillRect(j * 120 + 5, i * 120 + 5, 110, 110);
-                if (this.board[i][j] > 0) {
-                    this.ctx.fillStyle = '#fff';
-                    this.ctx.fillText(this.board[i][j], j * 120 + 60, i * 120 + 60);
+        } else {
+            let [newI, newJ] = available[Math.floor(Math.random() * available.length)]
+            this.board[newI][newJ] = 2
+            for (var i = 0; i < this.board.length; i++) {
+                for (var j = 0; j < this.board[i].length; j++) {
+                    this.ctx.fillStyle = colorpalette[this.board[i][j]];
+                    this.ctx.fillRect(j * 120 + 5, i * 120 + 5, 110, 110);
+                    if (this.board[i][j] > 0) {
+                        this.ctx.fillStyle = '#fff';
+                        this.ctx.fillText(this.board[i][j], j * 120 + 60, i * 120 + 60);
+                    }
                 }
             }
+            return [newI, newJ]
         }
-        return [newI, newJ]
+    return [0, 0]
     }
     combind(direction) {
         let mergeX = (i, j, k) => {
